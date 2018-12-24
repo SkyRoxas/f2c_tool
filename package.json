@@ -27,6 +27,9 @@
   },
   "dependencies": {
     "express": "^4.16.2",
+    "gulp-consolidate": "^0.2.0",
+    "gulp-iconfont": "^10.0.2",
+    "gulp-pug": "^4.0.1",
     "path": "^0.12.7"
   }
 }

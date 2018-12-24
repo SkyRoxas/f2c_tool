@@ -8,20 +8,55 @@
   const browserSync = require('browser-sync').create()
   const imagemin = require('gulp-imagemin')
   const pug = require('gulp-pug')
+  const iconfont = require('gulp-iconfont')
+  const async = require('async')
+  const consolidate = require('gulp-consolidate')
 
   const config = {
     src: {
       js: './src/app/**/*.js',
-      sass: './src/sass/**/*.sass',
+      sass: './src/sass/app.sass',
       html: './src/html/**/*.pug',
-      image: './src/images/**/*.*'
+      image: './src/images/**/*.*',
+      iconfont: './src/assets/icons/*.svg',
+      iconfontCss: './src/assets/icons/iconfont.css'
+    },
+    watch: {
+      sass: './src/sass/**/*.sass',
     },
     dest: {
       js: './dest/js',
       sass: './dest/css/',
       html: './dest/',
-      image: './dest/images'
+      image: './dest/images',
+      font: './../fonts',
+      iconfontCss: './dest/css'
     }
+  }
+
+  const svgToIconfont = function() {
+    const iconStream = gulp.src([config.src.iconfont]) .pipe(iconfont({ fontName: 'iconfont' }))
+
+    async.parallel([
+      function handleGlyphs (cb) {
+        iconStream.on('glyphs', function(glyphs) {
+          gulp.src(config.src.iconfontCss)
+            .pipe(consolidate('lodash', {
+              glyphs,
+              fontName: 'iconfont',
+              fontPath: `${config.dest.font}/`,
+              className: 'icon'
+            }))
+            .pipe(gulp.dest(config.dest.iconfontCss))
+            .on('finish', cb)
+        })
+      },
+      function handleFonts (cb) {
+        iconStream
+          .pipe(gulp.dest(config.dest.font))
+          .on('finish', cb)
+      }
+    ])
   }
 
   const minifyJS = function() {
@@ -48,6 +83,10 @@
     minifySASS()
   })
 
+  gulp.task('svgToIconfont', function() {
+    svgToIconfont()
+  })
+
   gulp.task('minifyHTML', function() {
     minifyHTML()
   })
@@ -68,7 +107,7 @@
 
   gulp.task('watch', ['browser-sync'], function() {
     watch([
-      config.src.js, config.src.sass, config.src.html, config.src.image
+      config.src.js, config.watch.sass, config.src.html, config.src.image, config.src.iconfont
     ], {
       verbose: true
     }, function(event) {
@@ -78,11 +117,13 @@
         minifySASS()
       } else if (/\.pug$/i.test(event.path)) {
         minifyHTML()
+      } else if (/\.svg$/i.test(event.path)) {
+        svgToIconfont()
       } else {
         imageMin()
       }
     })
   })
 
-    gulp.task('default', ['minify', 'watch'])
+    gulp.task('default', ['minify', 'watch', 'svgToIconfont'])
 })()
