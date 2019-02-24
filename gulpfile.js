@@ -29,8 +29,9 @@
       sass: './dest/css/',
       html: './dest/',
       image: './dest/images',
-      font: './../fonts',
-      iconfontCss: './dest/css'
+      font: './dest/fonts',
+      iconfontCss: './dest/css',
+      iconfontCssSrc: './../fonts/'
     }
   }
 
@@ -44,7 +45,7 @@
             .pipe(consolidate('lodash', {
               glyphs,
               fontName: 'iconfont',
-              fontPath: `${config.dest.font}/`,
+              fontPath: config.dest.iconfontCssSrc,
               className: 'icon'
             }))
             .pipe(gulp.dest(config.dest.iconfontCss))
