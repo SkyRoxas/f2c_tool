@@ -126,5 +126,6 @@
     })
   })
 
-    gulp.task('default', ['minify', 'watch', 'svgToIconfont'])
+  gulp.task('default', ['minify', 'watch', 'svgToIconfont'])
+  gulp.task('build', ['minify', 'svgToIconfont'])
 })()
