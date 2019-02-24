@@ -60,7 +60,7 @@
   }
 
   const minifyJS = function() {
-    return gulp.src(config.src.js).pipe(webpack(require('./webpack.config.js'))).pipe(gulp.dest(config.dest.js)).pipe(browserSync.reload({stream: true, once: true}))
+    return gulp.src(config.src.js).pipe(webpack(require('./webpack.config.js')).on('error', function(err){console.log(err)})).pipe(gulp.dest(config.dest.js)).pipe(browserSync.reload({stream: true, once: true}))
   }
 
   const minifySASS = function() {
